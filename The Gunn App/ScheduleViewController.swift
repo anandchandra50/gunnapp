@@ -7,7 +7,8 @@
 //
 
 import UIKit
-import Foundation
+import Alamofire
+import CircularSpinner
 
 class ScheduleViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
@@ -18,7 +19,8 @@ class ScheduleViewController: UIViewController, UITableViewDataSource, UITableVi
     @IBOutlet weak var timeProgressBar: UIProgressView!
     @IBOutlet weak var segmentedController: UISegmentedControl!
     
-    
+    private var currentEvents: [Event] = []
+    private var fetched = false
     var alternateScheduleDates : [String] = []
     var scheduleForCurrentDay : [Period] = []
     var whichSegControl : Int = 0
@@ -34,7 +36,7 @@ class ScheduleViewController: UIViewController, UITableViewDataSource, UITableVi
     
     
     @IBAction func updateInfo(_ sender: AnyObject) {
-        viewDidLoad()
+        updateUI()
     }
     
     @IBOutlet weak var distanceToTableShort: NSLayoutConstraint!
@@ -51,7 +53,7 @@ class ScheduleViewController: UIViewController, UITableViewDataSource, UITableVi
         if segmentedController.selectedSegmentIndex == 0 {
             whichSegControl = 0
             scheduleForCurrentDay.removeAll()
-            viewDidLoad()
+            updateUI()
             scheduleTable.reloadData()
             minutesRemaining.isHidden = false
             timeProgressBar.isHidden = false
@@ -66,7 +68,7 @@ class ScheduleViewController: UIViewController, UITableViewDataSource, UITableVi
         if segmentedController.selectedSegmentIndex == 1 {
             whichSegControl = 1
             scheduleForCurrentDay.removeAll()
-            viewDidLoad()
+            updateUI()
             scheduleTable.reloadData()
             minutesRemaining.isHidden = true
             timeProgressBar.isHidden = true
@@ -135,75 +137,123 @@ class ScheduleViewController: UIViewController, UITableViewDataSource, UITableVi
     var timer: Timer!
     var refresher: UIRefreshControl!
     
-    //
-    //    override func viewDidLoad() {
-    //        super.viewDidLoad()
-    //            }
     
     func refreshEvery15Secs(){
-        viewDidLoad()
+        updateEventData()
         print("Refreshed: ")
     }
     
     func refresh(_ sender: AnyObject){
-        
-        refreshEvery15Secs() // calls when ever button is pressed
+        fetchTodayCalendar()
     }
-    var num = 0;
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     override func viewDidLoad() {
-        let specialColor = UIColor(red: 255.0/255.0, green: 14.0/255.0, blue: 14.0/255.0, alpha: 1.0)
-        navigationController!.navigationBar.barTintColor = specialColor
-        //navigationController!.navigationBar.barStyle = UIBarStyle.Black
-        //navigationController!.navigationBar.tintColor = UIColor.whiteColor()
-        //navigationController!.navigationBar.barTintColor = UIColor.whiteColor()
-        super.viewDidLoad()
-        //        yourButton.addTarget(self, action: "refresh:", forControlEvents: .TouchUpInside)
-        if num < 1 {
-            refresher = UIRefreshControl()
-            refresher.addTarget(self, action: #selector(ScheduleViewController.refresh(_:)), for: .valueChanged)
-            
-            timer = Timer.scheduledTimer(timeInterval: 15.0, target: self, selector:#selector(ScheduleViewController.refreshEvery15Secs), userInfo: nil, repeats: true)
-            num += 1
-        }
-        // Do any additional setup after loading the view, typically from a nib.
         scheduleTable.delegate = self
         scheduleTable.dataSource = self
+        refresher = UIRefreshControl()
+        refresher.addTarget(self, action: #selector(ScheduleViewController.refresh(_:)), for: .valueChanged)
+        
+        timer = Timer.scheduledTimer(timeInterval: 15.0, target: self, selector:#selector(ScheduleViewController.refreshEvery15Secs), userInfo: nil, repeats: true)
+        updateUI()
+    }
+    
+    
+    private func fetchTodayCalendar() {
+        print("fetching calendar!")
+        //https://www.googleapis.com/calendar/v3/calendars/u5mgb2vlddfj70d7frf3r015h0@group.calendar.google.com/events?key=AIzaSyApXsfqthjz95RcM07CIF_1sApEvr4fN80&&singleEvents=true&&orderBy=startTime&timeMin=2017-08-1T00:00:00-07:00
+        
+        let today = Date()
+        let startTime = today.iso8601
+        let twoDaysFromNow = Calendar.current.date(byAdding: .day, value: 2, to: today)!
+        let endTime = twoDaysFromNow.iso8601
+        
+        let url = URL(string: "https://www.googleapis.com/calendar/v3/calendars/u5mgb2vlddfj70d7frf3r015h0@group.calendar.google.com/events?key=AIzaSyApXsfqthjz95RcM07CIF_1sApEvr4fN80&&singleEvents=true&&orderBy=startTime&timeMin=\(startTime)&timeMax=\(endTime)")!
+        print("url is \(url)")
+        
+        Alamofire.request(url).responseJSON { (response) in
+            if let events = response.result.value as? [[String: Any]] {
+                print("got result: \(events)")
+                for event in events {
+                    let eve : Event? = Event()
+                    if let startingPoint = event["start"] as? [String: Any] {
+                        if let startDate = startingPoint["date"] as? String {
+                            eve!.startDate = startDate
+                        }
+                        if let startTime = startingPoint["dateTime"] as? String {
+                            eve!.startTime = startTime
+                        }
+                    }
+                    if let endingPoint = event["end"] as? [String: Any] {
+                        if let endDate = endingPoint["date"] as? String {
+                            eve!.endDate = endDate
+                        }
+                        if let endTime = endingPoint["dateTime"] as? String {
+                            eve!.endTime = endTime
+                        }
+                    }
+                    if let summary = event["summary"] as? String {
+                        eve!.summary = summary
+                        // print("This happened (Summary stuff)")
+                    }
+                    if let location = event["location"] as? String {
+                        eve!.location = location
+                        // print("This happened (Location stuff)")
+                    }
+                    if let description = event["description"] as? String {
+                        eve!.description = description
+                        // print("This happened (Description stuff)")
+                    }
+                    let currentDate = Date()
+                    if(eve!.startTime! != ""){
+                        
+                        if(self.laterThanToday(eve!.startTime!)){
+                            self.currentEvents.append(eve!)
+                            // print("This happened")
+                        }
+                    }
+                    else if(eve!.startDate != ""){
+                        if(self.laterThanToday(eve!.startDate!)){
+                            self.currentEvents.append(eve!)
+                            // print("This happened")
+                        }
+                    }
+                    
+                }
+
+            }
+            CircularSpinner.hide()
+            self.updateEventData()
+
+        }
+        
+    }
+    
+    private func parseJSON() {
+        
+    }
+    
+    private func updateUI() {
+        CircularSpinner.show("", animated: true, type: .indeterminate)
+        let specialColor = UIColor(red: 255.0/255.0, green: 14.0/255.0, blue: 14.0/255.0, alpha: 1.0)
+        navigationController!.navigationBar.barTintColor = specialColor
+
+        // Do any additional setup after loading the view, typically from a nib.
+        /*
         let json = DownloadJSON()
         let events = json.downloadAndParseJSON()
+        */
+        
+        
+        fetchTodayCalendar()
+       
+    }
+    
+    private func updateEventData() {
+        guard currentEvents.count != 0 else {
+            useDefaultSchedule()
+            return
+        }
+        let events = currentEvents
         for i in 0..<events.count {
             if let summary = events[i].getSummary() {
                 if summary.lowercased().range(of: "schedule") != nil && summary.lowercased().range(of: "below") != nil && summary.lowercased().range(of: "back") == nil && summary.lowercased().range(of: "school") == nil && summary.lowercased().range(of: "night") == nil {
@@ -392,16 +442,85 @@ class ScheduleViewController: UIViewController, UITableViewDataSource, UITableVi
                 print("REGULAR SCHEDULE DAY")
                 print(todayDate)
                 let dayOfWeek = getDayOfWeek(today: todayDate)
-                    print("It looks like we passed the dayOfWeek if let successfully")
-                    var todayDateText1 = String(describing: dayOfWeek!) + ", "
-                    var todayDateText2 = String(monthConverter(month!)) + " "
-                    var todayDateText3 = String(describing: day!) + ", "
-                    var todayDateText4 = String(describing: year!) + " "
-                    var todayDateText = todayDateText1 + todayDateText2 + todayDateText3 + todayDateText4
-                    var displayedText = todayDateText + "(Regular Schedule)"
+                print("It looks like we passed the dayOfWeek if let successfully")
+                var todayDateText1 = String(describing: dayOfWeek!) + ", "
+                var todayDateText2 = String(monthConverter(month!)) + " "
+                var todayDateText3 = String(describing: day!) + ", "
+                var todayDateText4 = String(describing: year!) + " "
+                var todayDateText = todayDateText1 + todayDateText2 + todayDateText3 + todayDateText4
+                var displayedText = todayDateText + "(Regular Schedule)"
+                
+                dayAndDate.text = displayedText
+                
+                if displayedText.characters.count <= 38 {
+                    dayAndDate.font = UIFont.systemFont(ofSize: 17)
+                } else if displayedText.characters.count <= 40 {
+                    dayAndDate.font = UIFont.systemFont(ofSize: 16)
+                } else if displayedText.characters.count <= 42 {
+                    dayAndDate.font = UIFont.systemFont(ofSize: 15)
+                } else if displayedText.characters.count <= 45 {
+                    dayAndDate.font = UIFont.systemFont(ofSize: 14)
+                } else if displayedText.characters.count <= 47 {
+                    dayAndDate.font = UIFont.systemFont(ofSize: 13)
+                } else if displayedText.characters.count <= 50 {
+                    dayAndDate.font = UIFont.systemFont(ofSize: 12)
+                } else {
+                    dayAndDate.font = UIFont.systemFont(ofSize: 11)
+                }
+                
+                
+                if dayOfWeek == "Monday" {
+                    scheduleForCurrentDay.append(Period(name: "A", startTime: "8:25", endTime: "9:45"))
+                    scheduleForCurrentDay.append(Period(name: "Brunch", startTime: "9:45", endTime: "10:00"))
+                    scheduleForCurrentDay.append(Period(name: "B", startTime: "10:00", endTime: "11:15"))
+                    scheduleForCurrentDay.append(Period(name: "C", startTime: "11:25", endTime: "12:40"))
+                    scheduleForCurrentDay.append(Period(name: "Lunch", startTime: "12:40", endTime: "1:20"))
+                    scheduleForCurrentDay.append(Period(name: "F", startTime: "1:20", endTime: "2:35"))
                     
+                    
+                } else if dayOfWeek == "Tuesday" {
+                    scheduleForCurrentDay.append(Period(name: "D", startTime: "8:25", endTime: "9:45"))
+                    scheduleForCurrentDay.append(Period(name: "Brunch", startTime: "9:45", endTime: "10:00"))
+                    scheduleForCurrentDay.append(Period(name: "FlexTime/SEL", startTime: "10:00", endTime: "10:50"))
+                    scheduleForCurrentDay.append(Period(name: "E", startTime: "11:00", endTime: "12:15"))
+                    scheduleForCurrentDay.append(Period(name: "Lunch", startTime: "12:15", endTime: "12:55"))
+                    scheduleForCurrentDay.append(Period(name: "A", startTime: "12:55", endTime: "2:15"))
+                    scheduleForCurrentDay.append(Period(name: "G", startTime: "2:25", endTime: "3:40"))
+                    
+                    
+                } else if dayOfWeek == "Wednesday" {
+                    scheduleForCurrentDay.append(Period(name: "B", startTime: "8:25", endTime: "9:50"))
+                    scheduleForCurrentDay.append(Period(name: "Brunch", startTime: "9:50", endTime: "10:05"))
+                    scheduleForCurrentDay.append(Period(name: "C", startTime: "10:05", endTime: "11:25"))
+                    scheduleForCurrentDay.append(Period(name: "D", startTime: "11:35", endTime: "12:55"))
+                    scheduleForCurrentDay.append(Period(name: "Lunch", startTime: "12:55", endTime: "1:35"))
+                    scheduleForCurrentDay.append(Period(name: "F", startTime: "1:35", endTime: "2:55"))
+                    
+                } else if dayOfWeek == "Thursday" {
+                    scheduleForCurrentDay.append(Period(name: "E", startTime: "8:25", endTime: "9:50"))
+                    scheduleForCurrentDay.append(Period(name: "Brunch", startTime: "9:50", endTime: "10:05"))
+                    scheduleForCurrentDay.append(Period(name: "FlexTime/SEL", startTime: "10:05", endTime: "10:55"))
+                    scheduleForCurrentDay.append(Period(name: "B", startTime: "11:05", endTime: "12:15"))
+                    scheduleForCurrentDay.append(Period(name: "Lunch", startTime: "12:15", endTime: "12:55"))
+                    scheduleForCurrentDay.append(Period(name: "A", startTime: "12:55", endTime: "2:05"))
+                    scheduleForCurrentDay.append(Period(name: "G", startTime: "2:15", endTime: "3:35"))
+                    
+                } else if dayOfWeek == "Friday" {
+                    scheduleForCurrentDay.append(Period(name: "C", startTime: "8:25", endTime: "9:40"))
+                    scheduleForCurrentDay.append(Period(name: "Brunch", startTime: "9:40", endTime: "9:55"))
+                    scheduleForCurrentDay.append(Period(name: "D", startTime: "9:55", endTime: "11:05"))
+                    scheduleForCurrentDay.append(Period(name: "E", startTime: "11:15", endTime: "12:25"))
+                    scheduleForCurrentDay.append(Period(name: "Lunch", startTime: "12:25", endTime: "1:05"))
+                    scheduleForCurrentDay.append(Period(name: "F", startTime: "1:05", endTime: "2:15"))
+                    scheduleForCurrentDay.append(Period(name: "G", startTime: "2:25", endTime: "3:35"))
+                    
+                } else {
+                    var todayDateText1 = String(describing: getDayOfWeek) + ", "
+                    var todayDateText2 = String(monthConverter(month!))
+                    var todayDateText3 = " " + String(describing: day) + ", " + String(describing: year) + " "
+                    var todayDateText = todayDateText1 + todayDateText2! + todayDateText3
+                    displayedText = todayDateText + "(No School!)"
                     dayAndDate.text = displayedText
-                    
                     if displayedText.characters.count <= 38 {
                         dayAndDate.font = UIFont.systemFont(ofSize: 17)
                     } else if displayedText.characters.count <= 40 {
@@ -417,78 +536,9 @@ class ScheduleViewController: UIViewController, UITableViewDataSource, UITableVi
                     } else {
                         dayAndDate.font = UIFont.systemFont(ofSize: 11)
                     }
-                    
-                    
-                    if dayOfWeek == "Monday" {
-                        scheduleForCurrentDay.append(Period(name: "A", startTime: "8:25", endTime: "9:45"))
-                        scheduleForCurrentDay.append(Period(name: "Brunch", startTime: "9:45", endTime: "10:00"))
-                        scheduleForCurrentDay.append(Period(name: "B", startTime: "10:00", endTime: "11:15"))
-                        scheduleForCurrentDay.append(Period(name: "C", startTime: "11:25", endTime: "12:40"))
-                        scheduleForCurrentDay.append(Period(name: "Lunch", startTime: "12:40", endTime: "1:20"))
-                        scheduleForCurrentDay.append(Period(name: "F", startTime: "1:20", endTime: "2:35"))
-                        
-                        
-                    } else if dayOfWeek == "Tuesday" {
-                        scheduleForCurrentDay.append(Period(name: "D", startTime: "8:25", endTime: "9:45"))
-                        scheduleForCurrentDay.append(Period(name: "Brunch", startTime: "9:45", endTime: "10:00"))
-                        scheduleForCurrentDay.append(Period(name: "FlexTime/SEL", startTime: "10:00", endTime: "10:50"))
-                        scheduleForCurrentDay.append(Period(name: "E", startTime: "11:00", endTime: "12:15"))
-                        scheduleForCurrentDay.append(Period(name: "Lunch", startTime: "12:15", endTime: "12:55"))
-                        scheduleForCurrentDay.append(Period(name: "A", startTime: "12:55", endTime: "2:15"))
-                        scheduleForCurrentDay.append(Period(name: "G", startTime: "2:25", endTime: "3:40"))
-                        
-                        
-                    } else if dayOfWeek == "Wednesday" {
-                        scheduleForCurrentDay.append(Period(name: "B", startTime: "8:25", endTime: "9:50"))
-                        scheduleForCurrentDay.append(Period(name: "Brunch", startTime: "9:50", endTime: "10:05"))
-                        scheduleForCurrentDay.append(Period(name: "C", startTime: "10:05", endTime: "11:25"))
-                        scheduleForCurrentDay.append(Period(name: "D", startTime: "11:35", endTime: "12:55"))
-                        scheduleForCurrentDay.append(Period(name: "Lunch", startTime: "12:55", endTime: "1:35"))
-                        scheduleForCurrentDay.append(Period(name: "F", startTime: "1:35", endTime: "2:55"))
-                        
-                    } else if dayOfWeek == "Thursday" {
-                        scheduleForCurrentDay.append(Period(name: "E", startTime: "8:25", endTime: "9:50"))
-                        scheduleForCurrentDay.append(Period(name: "Brunch", startTime: "9:50", endTime: "10:05"))
-                        scheduleForCurrentDay.append(Period(name: "FlexTime/SEL", startTime: "10:05", endTime: "10:55"))
-                        scheduleForCurrentDay.append(Period(name: "B", startTime: "11:05", endTime: "12:15"))
-                        scheduleForCurrentDay.append(Period(name: "Lunch", startTime: "12:15", endTime: "12:55"))
-                        scheduleForCurrentDay.append(Period(name: "A", startTime: "12:55", endTime: "2:05"))
-                        scheduleForCurrentDay.append(Period(name: "G", startTime: "2:15", endTime: "3:35"))
-                        
-                    } else if dayOfWeek == "Friday" {
-                        scheduleForCurrentDay.append(Period(name: "C", startTime: "8:25", endTime: "9:40"))
-                        scheduleForCurrentDay.append(Period(name: "Brunch", startTime: "9:40", endTime: "9:55"))
-                        scheduleForCurrentDay.append(Period(name: "D", startTime: "9:55", endTime: "11:05"))
-                        scheduleForCurrentDay.append(Period(name: "E", startTime: "11:15", endTime: "12:25"))
-                        scheduleForCurrentDay.append(Period(name: "Lunch", startTime: "12:25", endTime: "1:05"))
-                        scheduleForCurrentDay.append(Period(name: "F", startTime: "1:05", endTime: "2:15"))
-                        scheduleForCurrentDay.append(Period(name: "G", startTime: "2:25", endTime: "3:35"))
-                        
-                    } else {
-                        var todayDateText1 = String(describing: getDayOfWeek) + ", "
-                        var todayDateText2 = String(monthConverter(month!))
-                        var todayDateText3 = " " + String(describing: day) + ", " + String(describing: year) + " "
-                        var todayDateText = todayDateText1 + todayDateText2! + todayDateText3
-                        displayedText = todayDateText + "(No School!)"
-                        dayAndDate.text = displayedText
-                        if displayedText.characters.count <= 38 {
-                            dayAndDate.font = UIFont.systemFont(ofSize: 17)
-                        } else if displayedText.characters.count <= 40 {
-                            dayAndDate.font = UIFont.systemFont(ofSize: 16)
-                        } else if displayedText.characters.count <= 42 {
-                            dayAndDate.font = UIFont.systemFont(ofSize: 15)
-                        } else if displayedText.characters.count <= 45 {
-                            dayAndDate.font = UIFont.systemFont(ofSize: 14)
-                        } else if displayedText.characters.count <= 47 {
-                            dayAndDate.font = UIFont.systemFont(ofSize: 13)
-                        } else if displayedText.characters.count <= 50 {
-                            dayAndDate.font = UIFont.systemFont(ofSize: 12)
-                        } else {
-                            dayAndDate.font = UIFont.systemFont(ofSize: 11)
-                        }
-                    }
-                    
-                    
+                }
+                
+                
                 
             }
             
@@ -576,13 +626,6 @@ class ScheduleViewController: UIViewController, UITableViewDataSource, UITableVi
             }
             
             timeProgressBar.setProgress(progressBarValue, animated: false)
-            
-            
-            
-            
-            
-            
-            
             
             
             
@@ -750,103 +793,7 @@ class ScheduleViewController: UIViewController, UITableViewDataSource, UITableVi
                 }
                 
             } else { // the code below is for regular schedules
-                if let dayOfWeek = getDayOfWeek(today: todayDate) {
-                    
-                    var part1OfDisplayedText = String(dayOfWeek) + ", " + String(monthConverter(month))
-                    var part2OfDisplayedText = " " + String(describing: day) + ", " + String(describing: year) + " " + "(Regular Schedule)"
-                    var displayedText = part1OfDisplayedText + part2OfDisplayedText
-                    // var displayedText = String(dayOfWeek) + ", " + String(monthConverter(month)) + " " + String(day) + ", " + String(year) + " " + "(Regular Schedule)"
-                    
-                    dayAndDate.text = displayedText
-                    
-                    if displayedText.characters.count <= 38 {
-                        dayAndDate.font = UIFont.systemFont(ofSize: 17)
-                    } else if displayedText.characters.count <= 40 {
-                        dayAndDate.font = UIFont.systemFont(ofSize: 16)
-                    } else if displayedText.characters.count <= 42 {
-                        dayAndDate.font = UIFont.systemFont(ofSize: 15)
-                    } else if displayedText.characters.count <= 45 {
-                        dayAndDate.font = UIFont.systemFont(ofSize: 14)
-                    } else if displayedText.characters.count <= 47 {
-                        dayAndDate.font = UIFont.systemFont(ofSize: 13)
-                    } else if displayedText.characters.count <= 50 {
-                        dayAndDate.font = UIFont.systemFont(ofSize: 12)
-                    } else {
-                        dayAndDate.font = UIFont.systemFont(ofSize: 11)
-                    }
-                    
-                    
-                    if dayOfWeek == "Monday" {
-                        scheduleForCurrentDay.append(Period(name: "A", startTime: "8:25", endTime: "9:45"))
-                        scheduleForCurrentDay.append(Period(name: "Brunch", startTime: "9:45", endTime: "10:00"))
-                        scheduleForCurrentDay.append(Period(name: "B", startTime: "10:00", endTime: "11:15"))
-                        scheduleForCurrentDay.append(Period(name: "C", startTime: "11:25", endTime: "12:40"))
-                        scheduleForCurrentDay.append(Period(name: "Lunch", startTime: "12:40", endTime: "1:20"))
-                        scheduleForCurrentDay.append(Period(name: "F", startTime: "1:20", endTime: "2:35"))
-                        
-                        
-                    } else if dayOfWeek == "Tuesday" {
-                        scheduleForCurrentDay.append(Period(name: "D", startTime: "8:25", endTime: "9:45"))
-                        scheduleForCurrentDay.append(Period(name: "Brunch", startTime: "9:45", endTime: "10:00"))
-                        scheduleForCurrentDay.append(Period(name: "FlexTime/SEL", startTime: "10:00", endTime: "10:50"))
-                        scheduleForCurrentDay.append(Period(name: "E", startTime: "11:00", endTime: "12:15"))
-                        scheduleForCurrentDay.append(Period(name: "Lunch", startTime: "12:15", endTime: "12:55"))
-                        scheduleForCurrentDay.append(Period(name: "A", startTime: "12:55", endTime: "2:15"))
-                        scheduleForCurrentDay.append(Period(name: "G", startTime: "2:25", endTime: "3:40"))
-                        
-                        
-                    } else if dayOfWeek == "Wednesday" {
-                        scheduleForCurrentDay.append(Period(name: "B", startTime: "8:25", endTime: "9:50"))
-                        scheduleForCurrentDay.append(Period(name: "Brunch", startTime: "9:50", endTime: "10:05"))
-                        scheduleForCurrentDay.append(Period(name: "C", startTime: "10:05", endTime: "11:25"))
-                        scheduleForCurrentDay.append(Period(name: "D", startTime: "11:35", endTime: "12:55"))
-                        scheduleForCurrentDay.append(Period(name: "Lunch", startTime: "12:55", endTime: "1:35"))
-                        scheduleForCurrentDay.append(Period(name: "F", startTime: "1:35", endTime: "2:55"))
-                        
-                    } else if dayOfWeek == "Thursday" {
-                        scheduleForCurrentDay.append(Period(name: "E", startTime: "8:25", endTime: "9:50"))
-                        scheduleForCurrentDay.append(Period(name: "Brunch", startTime: "9:50", endTime: "10:05"))
-                        scheduleForCurrentDay.append(Period(name: "FlexTime/SEL", startTime: "10:05", endTime: "10:55"))
-                        scheduleForCurrentDay.append(Period(name: "B", startTime: "11:05", endTime: "12:15"))
-                        scheduleForCurrentDay.append(Period(name: "Lunch", startTime: "12:15", endTime: "12:55"))
-                        scheduleForCurrentDay.append(Period(name: "A", startTime: "12:55", endTime: "2:05"))
-                        scheduleForCurrentDay.append(Period(name: "G", startTime: "2:15", endTime: "3:35"))
-                        
-                    } else if dayOfWeek == "Friday" {
-                        scheduleForCurrentDay.append(Period(name: "C", startTime: "8:25", endTime: "9:40"))
-                        scheduleForCurrentDay.append(Period(name: "Brunch", startTime: "9:40", endTime: "9:55"))
-                        scheduleForCurrentDay.append(Period(name: "D", startTime: "9:55", endTime: "11:05"))
-                        scheduleForCurrentDay.append(Period(name: "E", startTime: "11:15", endTime: "12:25"))
-                        scheduleForCurrentDay.append(Period(name: "Lunch", startTime: "12:25", endTime: "1:05"))
-                        scheduleForCurrentDay.append(Period(name: "F", startTime: "1:05", endTime: "2:15"))
-                        scheduleForCurrentDay.append(Period(name: "G", startTime: "2:25", endTime: "3:35"))
-                        
-                    } else {
-                        var displayedText1 = String(dayOfWeek) + ", "
-                        var displayedText2 = String(monthConverter(month)) + " "
-                        var displayedText3 = String(describing: day) + ", " + String(describing: year) + " " + "(No School!)"
-                        displayedText = displayedText1 + displayedText2 + displayedText3
-                        
-                        dayAndDate.text = displayedText
-                        if displayedText.characters.count <= 38 {
-                            dayAndDate.font = UIFont.systemFont(ofSize: 17)
-                        } else if displayedText.characters.count <= 40 {
-                            dayAndDate.font = UIFont.systemFont(ofSize: 16)
-                        } else if displayedText.characters.count <= 42 {
-                            dayAndDate.font = UIFont.systemFont(ofSize: 15)
-                        } else if displayedText.characters.count <= 45 {
-                            dayAndDate.font = UIFont.systemFont(ofSize: 14)
-                        } else if displayedText.characters.count <= 47 {
-                            dayAndDate.font = UIFont.systemFont(ofSize: 13)
-                        } else if displayedText.characters.count <= 50 {
-                            dayAndDate.font = UIFont.systemFont(ofSize: 12)
-                        } else {
-                            dayAndDate.font = UIFont.systemFont(ofSize: 11)
-                        }
-                    }
-                    
-                    
-                }
+                useDefaultSchedule()
             }
             
         }
@@ -857,10 +804,126 @@ class ScheduleViewController: UIViewController, UITableViewDataSource, UITableVi
     
     
     
-    
-    
-    
-    
+    private func useDefaultSchedule() {
+        
+        let calendar = Calendar.current
+        let date = Date()
+        let tomorrow = (calendar as NSCalendar).date(byAdding: .day, value: 1, to: Date(), options: [])
+        let components = (calendar as NSCalendar).components([.day , .month , .year, .hour , .minute], from: tomorrow!)
+        
+        
+        let year = components.year!
+        let month = components.month!
+        let day = components.day!
+        let hour = components.hour!
+        let minute = components.minute!
+        print("Tomorrow: \(year), \(month), \(day), \(hour), \(minute)")
+        
+        var todayDateYear = String(describing: year)
+        var todayDateMonth = String(describing: month)
+        var todayDateDay = String(describing: day)
+        print(todayDateDay)
+        var todayDate : String = todayDateYear + "-" + todayDateMonth + "-" + todayDateDay
+        
+        if let dayOfWeek = getDayOfWeek(today: todayDate) {
+            
+            var part1OfDisplayedText = String(dayOfWeek) + ", " + String(monthConverter(month))
+            var part2OfDisplayedText = " " + String(describing: day) + ", " + String(describing: year) + " " + "(Regular Schedule)"
+            var displayedText = part1OfDisplayedText + part2OfDisplayedText
+            // var displayedText = String(dayOfWeek) + ", " + String(monthConverter(month)) + " " + String(day) + ", " + String(year) + " " + "(Regular Schedule)"
+            
+            dayAndDate.text = displayedText
+            
+            if displayedText.characters.count <= 38 {
+                dayAndDate.font = UIFont.systemFont(ofSize: 17)
+            } else if displayedText.characters.count <= 40 {
+                dayAndDate.font = UIFont.systemFont(ofSize: 16)
+            } else if displayedText.characters.count <= 42 {
+                dayAndDate.font = UIFont.systemFont(ofSize: 15)
+            } else if displayedText.characters.count <= 45 {
+                dayAndDate.font = UIFont.systemFont(ofSize: 14)
+            } else if displayedText.characters.count <= 47 {
+                dayAndDate.font = UIFont.systemFont(ofSize: 13)
+            } else if displayedText.characters.count <= 50 {
+                dayAndDate.font = UIFont.systemFont(ofSize: 12)
+            } else {
+                dayAndDate.font = UIFont.systemFont(ofSize: 11)
+            }
+            
+            
+            if dayOfWeek == "Monday" {
+                scheduleForCurrentDay.append(Period(name: "A", startTime: "8:25", endTime: "9:45"))
+                scheduleForCurrentDay.append(Period(name: "Brunch", startTime: "9:45", endTime: "10:00"))
+                scheduleForCurrentDay.append(Period(name: "B", startTime: "10:00", endTime: "11:15"))
+                scheduleForCurrentDay.append(Period(name: "C", startTime: "11:25", endTime: "12:40"))
+                scheduleForCurrentDay.append(Period(name: "Lunch", startTime: "12:40", endTime: "1:20"))
+                scheduleForCurrentDay.append(Period(name: "F", startTime: "1:20", endTime: "2:35"))
+                
+                
+            } else if dayOfWeek == "Tuesday" {
+                scheduleForCurrentDay.append(Period(name: "D", startTime: "8:25", endTime: "9:45"))
+                scheduleForCurrentDay.append(Period(name: "Brunch", startTime: "9:45", endTime: "10:00"))
+                scheduleForCurrentDay.append(Period(name: "FlexTime/SEL", startTime: "10:00", endTime: "10:50"))
+                scheduleForCurrentDay.append(Period(name: "E", startTime: "11:00", endTime: "12:15"))
+                scheduleForCurrentDay.append(Period(name: "Lunch", startTime: "12:15", endTime: "12:55"))
+                scheduleForCurrentDay.append(Period(name: "A", startTime: "12:55", endTime: "2:15"))
+                scheduleForCurrentDay.append(Period(name: "G", startTime: "2:25", endTime: "3:40"))
+                
+                
+            } else if dayOfWeek == "Wednesday" {
+                scheduleForCurrentDay.append(Period(name: "B", startTime: "8:25", endTime: "9:50"))
+                scheduleForCurrentDay.append(Period(name: "Brunch", startTime: "9:50", endTime: "10:05"))
+                scheduleForCurrentDay.append(Period(name: "C", startTime: "10:05", endTime: "11:25"))
+                scheduleForCurrentDay.append(Period(name: "D", startTime: "11:35", endTime: "12:55"))
+                scheduleForCurrentDay.append(Period(name: "Lunch", startTime: "12:55", endTime: "1:35"))
+                scheduleForCurrentDay.append(Period(name: "F", startTime: "1:35", endTime: "2:55"))
+                
+            } else if dayOfWeek == "Thursday" {
+                scheduleForCurrentDay.append(Period(name: "E", startTime: "8:25", endTime: "9:50"))
+                scheduleForCurrentDay.append(Period(name: "Brunch", startTime: "9:50", endTime: "10:05"))
+                scheduleForCurrentDay.append(Period(name: "FlexTime/SEL", startTime: "10:05", endTime: "10:55"))
+                scheduleForCurrentDay.append(Period(name: "B", startTime: "11:05", endTime: "12:15"))
+                scheduleForCurrentDay.append(Period(name: "Lunch", startTime: "12:15", endTime: "12:55"))
+                scheduleForCurrentDay.append(Period(name: "A", startTime: "12:55", endTime: "2:05"))
+                scheduleForCurrentDay.append(Period(name: "G", startTime: "2:15", endTime: "3:35"))
+                
+            } else if dayOfWeek == "Friday" {
+                scheduleForCurrentDay.append(Period(name: "C", startTime: "8:25", endTime: "9:40"))
+                scheduleForCurrentDay.append(Period(name: "Brunch", startTime: "9:40", endTime: "9:55"))
+                scheduleForCurrentDay.append(Period(name: "D", startTime: "9:55", endTime: "11:05"))
+                scheduleForCurrentDay.append(Period(name: "E", startTime: "11:15", endTime: "12:25"))
+                scheduleForCurrentDay.append(Period(name: "Lunch", startTime: "12:25", endTime: "1:05"))
+                scheduleForCurrentDay.append(Period(name: "F", startTime: "1:05", endTime: "2:15"))
+                scheduleForCurrentDay.append(Period(name: "G", startTime: "2:25", endTime: "3:35"))
+                
+            } else {
+                var displayedText1 = String(dayOfWeek) + ", "
+                var displayedText2 = String(monthConverter(month)) + " "
+                var displayedText3 = String(describing: day) + ", " + String(describing: year) + " " + "(No School!)"
+                displayedText = displayedText1 + displayedText2 + displayedText3
+                
+                dayAndDate.text = displayedText
+                if displayedText.characters.count <= 38 {
+                    dayAndDate.font = UIFont.systemFont(ofSize: 17)
+                } else if displayedText.characters.count <= 40 {
+                    dayAndDate.font = UIFont.systemFont(ofSize: 16)
+                } else if displayedText.characters.count <= 42 {
+                    dayAndDate.font = UIFont.systemFont(ofSize: 15)
+                } else if displayedText.characters.count <= 45 {
+                    dayAndDate.font = UIFont.systemFont(ofSize: 14)
+                } else if displayedText.characters.count <= 47 {
+                    dayAndDate.font = UIFont.systemFont(ofSize: 13)
+                } else if displayedText.characters.count <= 50 {
+                    dayAndDate.font = UIFont.systemFont(ofSize: 12)
+                } else {
+                    dayAndDate.font = UIFont.systemFont(ofSize: 11)
+                }
+            }
+            
+            
+        }
+
+    }
     
     
     
@@ -1006,7 +1069,29 @@ class ScheduleViewController: UIViewController, UITableViewDataSource, UITableVi
         
         return cell
     }
+
     
-    
-    
+}
+
+
+extension Formatter {
+    static let iso8601: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX"
+        return formatter
+    }()
+}
+extension Date {
+    var iso8601: String {
+        return Formatter.iso8601.string(from: self)
+    }
+}
+
+extension String {
+    var dateFromISO8601: Date? {
+        return Formatter.iso8601.date(from: self)   // "Mar 22, 2017, 10:22 AM"
+    }
 }

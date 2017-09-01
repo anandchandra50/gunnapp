@@ -134,7 +134,7 @@ class EventsViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         //        downloadAndParseJSON()
         // return events.count
-        return 300
+        return events.count
         // return 10
     }
     
@@ -142,13 +142,7 @@ class EventsViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         //        downloadAndParseJSON()
-        
-        
-        
-        
-        
-        
-        
+
         
         let cellIdentifier = "EventsViewCell"
         

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3A1CFACEA874202BA5DF6A47 /* Pods_TheGunnApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5DD0517FCF6BA736214175E /* Pods_TheGunnApp.framework */; };
+		4627CD522E73AF5CFE6E0B3A /* Pods_TheGunnAppUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F8A7ECB5F626F5D77C425668 /* Pods_TheGunnAppUITests.framework */; };
 		4759AEFA1D2270E300BB502B /* PortalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4759AEF91D2270E300BB502B /* PortalViewController.swift */; };
 		475F506F1D7CC51E00115A7D /* CreditsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475F506E1D7CC51E00115A7D /* CreditsViewController.swift */; };
 		479770391D45CA8200E7FD66 /* Period.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479770381D45CA8200E7FD66 /* Period.swift */; };
@@ -30,12 +31,11 @@
 		47D7D4871D174DB500BC1F5D /* StaffTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D7D4861D174DB500BC1F5D /* StaffTableViewController.swift */; };
 		47D7D48B1D174F4C00BC1F5D /* Staff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D7D48A1D174F4C00BC1F5D /* Staff.swift */; };
 		47DD55301DE9314600275BE0 /* StudentID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DD552F1DE9314600275BE0 /* StudentID.swift */; };
-		47EC157E1F5557DC0038EF74 /* events-yes.json in Resources */ = {isa = PBXBuildFile; fileRef = 47EC157D1F5557DC0038EF74 /* events-yes.json */; };
 		47EC15801F55FE030038EF74 /* events.json in Resources */ = {isa = PBXBuildFile; fileRef = 47EC157F1F55FE030038EF74 /* events.json */; };
 		47EC15821F5618110038EF74 /* String+Indexing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47EC15811F5618110038EF74 /* String+Indexing.swift */; };
-		E710DB061D456756000B0508 /* events-original.json in Resources */ = {isa = PBXBuildFile; fileRef = E710DB051D456756000B0508 /* events-original.json */; };
 		E7AF28191D4EADB700FFEA15 /* EventInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7AF28181D4EADB700FFEA15 /* EventInfoViewController.swift */; };
 		E7EF96751D47FAF5008540B3 /* kannada.ttc in Resources */ = {isa = PBXBuildFile; fileRef = E7EF96741D47FAF5008540B3 /* kannada.ttc */; };
+		EB099B90B00F1BE9CCEF634F /* Pods_TheGunnAppTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB0D3774A9CC605298255C51 /* Pods_TheGunnAppTests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -86,14 +86,18 @@
 		47D7D4861D174DB500BC1F5D /* StaffTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StaffTableViewController.swift; sourceTree = "<group>"; };
 		47D7D48A1D174F4C00BC1F5D /* Staff.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Staff.swift; sourceTree = "<group>"; };
 		47DD552F1DE9314600275BE0 /* StudentID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StudentID.swift; sourceTree = "<group>"; };
-		47EC157D1F5557DC0038EF74 /* events-yes.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "events-yes.json"; sourceTree = "<group>"; };
 		47EC157F1F55FE030038EF74 /* events.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = events.json; sourceTree = "<group>"; };
 		47EC15811F5618110038EF74 /* String+Indexing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Indexing.swift"; sourceTree = "<group>"; };
+		89E5D6F9EF94F4F4E841CE2B /* Pods-TheGunnAppUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheGunnAppUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TheGunnAppUITests/Pods-TheGunnAppUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		938100FDE7F78A8239592CDB /* Pods-TheGunnApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheGunnApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-TheGunnApp/Pods-TheGunnApp.release.xcconfig"; sourceTree = "<group>"; };
+		AB0D3774A9CC605298255C51 /* Pods_TheGunnAppTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TheGunnAppTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B243005ABCD05FF7B3BC6FA1 /* Pods-TheGunnAppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheGunnAppTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TheGunnAppTests/Pods-TheGunnAppTests.debug.xcconfig"; sourceTree = "<group>"; };
+		C12772C0EE54266ED9CD9647 /* Pods-TheGunnAppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheGunnAppTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-TheGunnAppTests/Pods-TheGunnAppTests.release.xcconfig"; sourceTree = "<group>"; };
 		C5DD0517FCF6BA736214175E /* Pods_TheGunnApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TheGunnApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		E710DB051D456756000B0508 /* events-original.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "events-original.json"; sourceTree = "<group>"; };
+		CCC47687774F8C39453AC8CE /* Pods-TheGunnAppUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheGunnAppUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-TheGunnAppUITests/Pods-TheGunnAppUITests.release.xcconfig"; sourceTree = "<group>"; };
 		E7AF28181D4EADB700FFEA15 /* EventInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventInfoViewController.swift; sourceTree = "<group>"; };
 		E7EF96741D47FAF5008540B3 /* kannada.ttc */ = {isa = PBXFileReference; lastKnownFileType = file; path = kannada.ttc; sourceTree = "<group>"; };
+		F8A7ECB5F626F5D77C425668 /* Pods_TheGunnAppUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TheGunnAppUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +113,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EB099B90B00F1BE9CCEF634F /* Pods_TheGunnAppTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,6 +121,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4627CD522E73AF5CFE6E0B3A /* Pods_TheGunnAppUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,9 +164,7 @@
 				47D00AF21D3C4C85004B5E8F /* DownloadJSON.swift */,
 				4797703E1D4EAC7C00E7FD66 /* EventInfoViewController.swift */,
 				47D00AF01D3C3F2F004B5E8F /* Event.swift */,
-				E710DB051D456756000B0508 /* events-original.json */,
 				47EC157F1F55FE030038EF74 /* events.json */,
-				47EC157D1F5557DC0038EF74 /* events-yes.json */,
 				E7EF96741D47FAF5008540B3 /* kannada.ttc */,
 				4759AEF91D2270E300BB502B /* PortalViewController.swift */,
 				47DD552F1DE9314600275BE0 /* StudentID.swift */,
@@ -202,6 +206,8 @@
 			isa = PBXGroup;
 			children = (
 				C5DD0517FCF6BA736214175E /* Pods_TheGunnApp.framework */,
+				AB0D3774A9CC605298255C51 /* Pods_TheGunnAppTests.framework */,
+				F8A7ECB5F626F5D77C425668 /* Pods_TheGunnAppUITests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -211,6 +217,10 @@
 			children = (
 				2FCC4CBF035602B60139EE94 /* Pods-TheGunnApp.debug.xcconfig */,
 				938100FDE7F78A8239592CDB /* Pods-TheGunnApp.release.xcconfig */,
+				B243005ABCD05FF7B3BC6FA1 /* Pods-TheGunnAppTests.debug.xcconfig */,
+				C12772C0EE54266ED9CD9647 /* Pods-TheGunnAppTests.release.xcconfig */,
+				89E5D6F9EF94F4F4E841CE2B /* Pods-TheGunnAppUITests.debug.xcconfig */,
+				CCC47687774F8C39453AC8CE /* Pods-TheGunnAppUITests.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -242,9 +252,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 47D7D4381D04D24A00BC1F5D /* Build configuration list for PBXNativeTarget "TheGunnAppTests" */;
 			buildPhases = (
+				B193C2A7B07AA8CC4FC953A6 /* [CP] Check Pods Manifest.lock */,
 				47D7D41D1D04D24A00BC1F5D /* Sources */,
 				47D7D41E1D04D24A00BC1F5D /* Frameworks */,
 				47D7D41F1D04D24A00BC1F5D /* Resources */,
+				8EA0A64410DEBA11215A962A /* [CP] Embed Pods Frameworks */,
+				CE44123E2BABA9CC3A2A8236 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -260,9 +273,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 47D7D43B1D04D24A00BC1F5D /* Build configuration list for PBXNativeTarget "TheGunnAppUITests" */;
 			buildPhases = (
+				85BDDC3CFDD90B39A1FE625F /* [CP] Check Pods Manifest.lock */,
 				47D7D4281D04D24A00BC1F5D /* Sources */,
 				47D7D4291D04D24A00BC1F5D /* Frameworks */,
 				47D7D42A1D04D24A00BC1F5D /* Resources */,
+				8642F2CD442957C23984ABB7 /* [CP] Embed Pods Frameworks */,
+				BFCF13387F78B4B422276501 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -286,7 +302,7 @@
 				TargetAttributes = {
 					47D7D40A1D04D24A00BC1F5D = {
 						CreatedOnToolsVersion = 7.3.1;
-						DevelopmentTeam = 282V6W269K;
+						DevelopmentTeam = 3EDF6232H4;
 						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 					};
@@ -331,8 +347,6 @@
 				47D00AED1D3AE2CD004B5E8F /* GTMOAuth2ViewTouch.xib in Resources */,
 				47D7D41B1D04D24A00BC1F5D /* LaunchScreen.storyboard in Resources */,
 				E7EF96751D47FAF5008540B3 /* kannada.ttc in Resources */,
-				47EC157E1F5557DC0038EF74 /* events-yes.json in Resources */,
-				E710DB061D456756000B0508 /* events-original.json in Resources */,
 				47D7D4181D04D24A00BC1F5D /* Assets.xcassets in Resources */,
 				47D7D4161D04D24A00BC1F5D /* Main.storyboard in Resources */,
 			);
@@ -397,7 +411,97 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		85BDDC3CFDD90B39A1FE625F /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		8642F2CD442957C23984ABB7 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-TheGunnAppUITests/Pods-TheGunnAppUITests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8EA0A64410DEBA11215A962A /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-TheGunnAppTests/Pods-TheGunnAppTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B193C2A7B07AA8CC4FC953A6 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		BFCF13387F78B4B422276501 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-TheGunnAppUITests/Pods-TheGunnAppUITests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CE44123E2BABA9CC3A2A8236 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-TheGunnAppTests/Pods-TheGunnAppTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -573,7 +677,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: Xavi Loinaz (282V6W269K)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = 282V6W269K;
+				DEVELOPMENT_TEAM = 3EDF6232H4;
 				INFOPLIST_FILE = "The Gunn App/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -594,7 +698,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: Xavi Loinaz (282V6W269K)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = 282V6W269K;
+				DEVELOPMENT_TEAM = 3EDF6232H4;
 				GCC_OPTIMIZATION_LEVEL = 2;
 				INFOPLIST_FILE = "The Gunn App/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -611,6 +715,7 @@
 		};
 		47D7D4391D04D24A00BC1F5D /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B243005ABCD05FF7B3BC6FA1 /* Pods-TheGunnAppTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				INFOPLIST_FILE = "The Gunn AppTests/Info.plist";
@@ -624,6 +729,7 @@
 		};
 		47D7D43A1D04D24A00BC1F5D /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C12772C0EE54266ED9CD9647 /* Pods-TheGunnAppTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				INFOPLIST_FILE = "The Gunn AppTests/Info.plist";
@@ -637,6 +743,7 @@
 		};
 		47D7D43C1D04D24A00BC1F5D /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 89E5D6F9EF94F4F4E841CE2B /* Pods-TheGunnAppUITests.debug.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "The Gunn AppUITests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -649,6 +756,7 @@
 		};
 		47D7D43D1D04D24A00BC1F5D /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = CCC47687774F8C39453AC8CE /* Pods-TheGunnAppUITests.release.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "The Gunn AppUITests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
